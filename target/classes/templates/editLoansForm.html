@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container-fluid container-md">
+    <form action="#" th:action="@{/loans/edit/save}" th:object="${loansForm}" method="post">
+        <table class="table table-striped table-bordered table-condensed table-sm">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Interest Rate</th>
+                <th>Outstanding Balance</th>
+                <th>Contribution</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="loan, itemStat : ${loansForm.loans}">
+                <td hidden><input type="number" class="form-control form-control-sm" th:name="|loans[${itemStat.index}].id|"
+                                  th:value="${loan.getId()}"/>
+                </td>
+                <td><input type="text" class="form-control " th:name="|loans[${itemStat.index}].name|"
+                           th:value="${loan.getName()}"/>
+                </td>
+                <td><input type="number" class="form-control form-control-sm" step="0.01"
+                           th:name="|loans[${itemStat.index}].interestRate|"
+                           th:value="${loan.getInterestRate()}"/>
+                </td>
+                <td><input type="number" class="form-control form-control-sm" step="0.01"
+                           th:name="|loans[${itemStat.index}].outstandingBalance|"
+                           th:value="${loan.getOutstandingBalance()}"/>
+                </td>
+                <td><input type="number" class="form-control form-control-sm" step="0.01"
+                           th:name="|loans[${itemStat.index}].contribution|"
+                           th:value="${loan.getContribution()}"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="btn-group btn-group-md btn-group-justified">
+            <div class="btn-group">
+                <input type="submit" class="btn btn-primary" id="submitButton" th:value="Save">
+            </div>
+            <div class="btn-group">
+                <br>
+            </div>
+            <div class="btn-group">
+                <input type="reset" class="btn btn-primary" id="resetButton" th:value="Reset">
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

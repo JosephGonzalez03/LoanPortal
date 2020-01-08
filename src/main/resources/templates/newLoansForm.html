@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <form action="#" th:action="@{/loans/new/save}" th:object="${loanForm}" method="post">
+        <div class="btn-group btn-group-md btn-group-justified">
+            <div class="btn-group">
+                <input type="submit" class="btn btn-primary" id="submitButton" th:value="Save">
+            </div>
+            <div class="btn-group">
+                <br>
+            </div>
+            <div class="btn-group">
+                <input type="reset" class="btn btn-primary" id="resetButton" th:value="Reset">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col">
+                <label for="nameInput">Name</label>
+            </div>
+            <div class="col">
+                <label for="interestRateInput">Interest Rate</label>
+            </div>
+            <div class="col">
+                <label for="outstandingBalanceInput">Outstanding Balance</label>
+            </div>
+            <div class="col">
+                <label for="contributionInput">Contribution</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col">
+                <input type="text" id="nameInput" class="form-control" th:field="*{name}"/>>
+            </div>
+            <div class="col">
+                <input type="number" id="interestRateInput" class="form-control" step="0.01" th:field="*{interestRate}"/>>
+            </div>
+            <div class="col">
+                <input type="number" id="outstandingBalanceInput" class="form-control" step="0.01" th:field="*{outstandingBalance}"/>>
+            </div>
+            <div class="col">
+                <input type="number" id="contributionInput" class="form-control" step="0.01" th:field="*{contribution}"/>>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>
