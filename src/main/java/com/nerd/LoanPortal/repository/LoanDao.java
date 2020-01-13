@@ -51,7 +51,7 @@ public class LoanDao {
             PaymentReceipt paymentReceipt = new PaymentReceipt();
             paymentReceipt.setLoanName(currentLoan.getName());
             paymentReceipt.setOutStandingBalance(currentLoan.getOutstandingBalance());
-            paymentReceipt.increaseTotalContribution(currentLoan.getContribution());
+            paymentReceipt.setContribution(currentLoan.getContribution());
 
             // add loan payment receipt to other receipts for the month
             paymentSummary.getPaymentReceipts().add(paymentReceipt);
@@ -60,7 +60,7 @@ public class LoanDao {
         return paymentSummary;
     }
 
-    public PaymentSummaryList calculateLoanPayments(LoanList loanList) {
+    public PaymentSummaryList getPaymentSummaries(LoanList loanList) {
         LoanList loanListCopy = new LoanList(loanList.getLoans());
 
         boolean areAllLoansPaidOff = false;
@@ -86,5 +86,25 @@ public class LoanDao {
         }
 
         return paymentSummaries;
+    }
+
+    public PaymentSummary getTotalContributionsSummary(PaymentSummaryList paymentSummaryList) {
+        int numOfLoans = paymentSummaryList.getPaymentSummaries().get(0).getPaymentReceipts().size();
+        PaymentSummary totalContributionSummary = new PaymentSummary(numOfLoans);
+
+        // calculate total contribution for each loan
+        for (int i=0; i<paymentSummaryList.getPaymentSummaries().size(); i++) {
+            PaymentSummary currentPaymentSummary = new PaymentSummary(paymentSummaryList.getPaymentSummaries().get(i).getPaymentReceipts());
+
+            for (int j=0; j<currentPaymentSummary.getPaymentReceipts().size(); j++) {
+                PaymentReceipt currentPaymentReceipt = currentPaymentSummary.getPaymentReceipts().get(j);
+                PaymentReceipt currentTotalContributionReceipt = totalContributionSummary.getPaymentReceipts().get(j);
+
+                currentTotalContributionReceipt.setLoanName(currentPaymentReceipt.getLoanName());
+                currentTotalContributionReceipt.setContribution(currentTotalContributionReceipt.getContribution().add(currentPaymentReceipt.getContribution()));
+            }
+        }
+
+        return totalContributionSummary;
     }
 }

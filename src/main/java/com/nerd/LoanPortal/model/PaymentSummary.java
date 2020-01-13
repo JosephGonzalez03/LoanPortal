@@ -18,4 +18,16 @@ public class PaymentSummary implements Serializable {
     public PaymentSummary() {
         paymentReceipts = new ArrayList<>();
     }
+
+    public PaymentSummary(List<PaymentReceipt> paymentReceipts) {
+        paymentReceipts.forEach(paymentReceipt -> this.paymentReceipts.add(new PaymentReceipt(paymentReceipt.getLoanName(), paymentReceipt.getOutStandingBalance(), paymentReceipt.getContribution())));
+    }
+
+    public PaymentSummary(Integer numberOfReceipts) {
+        paymentReceipts = new ArrayList<>();
+
+        for (int i=0; i<numberOfReceipts; i++) {
+            paymentReceipts.add(new PaymentReceipt());
+        }
+    }
 }

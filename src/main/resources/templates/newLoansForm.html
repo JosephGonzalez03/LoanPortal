@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
 <div class="container-fluid">
@@ -40,16 +40,31 @@
         </div>
         <div class="form-row">
             <div class="col">
-                <input type="text" id="nameInput" class="form-control" th:field="*{name}"/>>
+                <div class="form-group">
+                    <input type="text" id="nameInput" class="form-control" th:field="*{name}" required/>>
+                    <div class="invalid-feedback">Please fill out this field.</div>
+                </div>
             </div>
             <div class="col">
-                <input type="number" id="interestRateInput" class="form-control" step="0.01" th:field="*{interestRate}"/>>
+                <div class="form-group">
+                    <input type="number" id="interestRateInput" class="form-control" step="0.01"
+                           th:field="*{interestRate}" required/>>
+                    <div class="invalid-feedback">Please fill out this field.</div>
+                </div>
             </div>
             <div class="col">
-                <input type="number" id="outstandingBalanceInput" class="form-control" step="0.01" th:field="*{outstandingBalance}"/>>
+                <div class="form-group">
+                    <input type="number" id="outstandingBalanceInput" class="form-control" step="0.01"
+                           th:field="*{outstandingBalance}" required/>>
+                    <div class="invalid-feedback">Please fill out this field.</div>
+                </div>
             </div>
             <div class="col">
-                <input type="number" id="contributionInput" class="form-control" step="0.01" th:field="*{contribution}"/>>
+                <div class="form-group">
+                    <input type="number" id="contributionInput" class="form-control" step="0.01"
+                           th:field="*{contribution}" required/>>
+                    <div class="invalid-feedback">Please fill out this field.</div>
+                </div>
             </div>
         </div>
     </form>

@@ -8,7 +8,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 
@@ -21,16 +24,24 @@ public class LoanPortalController {
     @Autowired
     private LoanDao loanDao;
 
-    @GetMapping("/loans/all")
-    public String main(Model model) {
+    @GetMapping("/loans")
+    public String orderedLoans(RedirectAttributes redirectAttributes, @RequestParam(defaultValue = "default") String orderBy) {
         RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        LoanList loanList = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, "default");
+        LoanList loanList = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, orderBy);
 
-        model.addAttribute("loans", loanList.getLoans());
-        model.addAttribute("paymentSummaryList", new PaymentSummaryList());
+        redirectAttributes.addFlashAttribute("raPaymentSummaryList", new PaymentSummaryList());
+        redirectAttributes.addFlashAttribute("raLoans", loanList.getLoans());
+        return "redirect:/loans/all";
+    }
+
+    @GetMapping("/loans/all")
+    public String main(Model model, @ModelAttribute("raLoans") List<Loan> loans, @ModelAttribute("raPaymentSummaryList") PaymentSummaryList paymentSummaryList) {
+        model.addAttribute("loans", loans);
+        model.addAttribute("paymentSummaryList", paymentSummaryList);
         return "loansTable";
     }
+
 
     @GetMapping("/loans/new")
     public String newLoansForm(Model model) {
@@ -45,7 +56,7 @@ public class LoanPortalController {
         RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
         loanRT.postForObject("/users/1/loans", loanForm, Loan.class);
-        return "redirect:/loans/all";
+        return "redirect:/loans";
     }
 
     @GetMapping("/loans/edit")
@@ -70,7 +81,7 @@ public class LoanPortalController {
             loanRT.put("/users/1/loans/" + currentLoan.getId(), currentLoan);
         }
 
-        return "redirect:/loans/all";
+        return "redirect:/loans";
     }
 
     @GetMapping("/loans/calculate")
@@ -79,11 +90,16 @@ public class LoanPortalController {
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
         LoanList loanList = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, "interest_rate");
 
+        PaymentSummaryList paymentSummaryList = loanDao.getPaymentSummaries(loanList);
+
         // populate loans table
         model.addAttribute("loans", loanList.getLoans());
 
         // populate payment summary table
-        model.addAttribute("paymentSummaryList", loanDao.calculateLoanPayments(loanList));
+        model.addAttribute("paymentSummaryList", paymentSummaryList);
+
+        // populate total contributions summary
+        model.addAttribute("totalContributionsSummary", loanDao.getTotalContributionsSummary(paymentSummaryList));
 
         return "loansTable";
     }
