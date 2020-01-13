@@ -1,15 +1,15 @@
-package com.nerd.LoanPortal.repository;
+package com.nerd.LoanPortal.service;
 
 import com.nerd.LoanPortal.model.*;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.List;
 
-@Repository
-public class LoanDao {
+@Service
+public class LoanService {
 
     private void makeMonthlyPayment(Loan loan) {
         BigDecimal currentAmount = loan.getOutstandingBalance(),

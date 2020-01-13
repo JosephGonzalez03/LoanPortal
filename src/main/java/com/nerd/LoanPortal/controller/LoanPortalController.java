@@ -1,7 +1,7 @@
 package com.nerd.LoanPortal.controller;
 
 import com.nerd.LoanPortal.model.*;
-import com.nerd.LoanPortal.repository.LoanDao;
+import com.nerd.LoanPortal.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class LoanPortalController {
     private RestTemplateConfiguration restTemplateConfiguration;
 
     @Autowired
-    private LoanDao loanDao;
+    private LoanService loanService;
 
     @GetMapping("/loans")
     public String orderedLoans(RedirectAttributes redirectAttributes, @RequestParam(defaultValue = "default") String orderBy) {
@@ -90,7 +89,7 @@ public class LoanPortalController {
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
         LoanList loanList = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, "interest_rate");
 
-        PaymentSummaryList paymentSummaryList = loanDao.getPaymentSummaries(loanList);
+        PaymentSummaryList paymentSummaryList = loanService.getPaymentSummaries(loanList);
 
         // populate loans table
         model.addAttribute("loans", loanList.getLoans());
@@ -99,7 +98,7 @@ public class LoanPortalController {
         model.addAttribute("paymentSummaryList", paymentSummaryList);
 
         // populate total contributions summary
-        model.addAttribute("totalContributionsSummary", loanDao.getTotalContributionsSummary(paymentSummaryList));
+        model.addAttribute("totalContributionsSummary", loanService.getTotalContributionsSummary(paymentSummaryList));
 
         return "loansTable";
     }
