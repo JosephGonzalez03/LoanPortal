@@ -23,6 +23,8 @@ public class LoanService {
     }
 
     private PaymentSummary makeMonthlyPayments(List<Loan> loans) {
+        BigDecimal oneTimeAdditionalContribution = BigDecimal.ZERO;
+        String nameOfNextLoan = new String();
         PaymentSummary paymentSummary = new PaymentSummary();
 
         for (Loan currentLoan : loans) {
@@ -35,10 +37,14 @@ public class LoanService {
 
             // if loan is paid off
             if (currentLoan.getOutstandingBalance().compareTo(BigDecimal.ZERO) <= 0) {
+                // save leftover contribution from paid off loan
+                oneTimeAdditionalContribution = currentLoan.getOutstandingBalance().abs();
+
                 // move contribution and leftover pay to next loan
                 for (Loan nextLoan : loans) {
                     if (!nextLoan.getName().contentEquals(currentLoan.getName()) && nextLoan.getContribution().compareTo(BigDecimal.ZERO) == 1) {
-                        //nextLoan.setOutstandingBalance(nextLoan.getOutstandingBalance().add(currentLoan.getOutstandingBalance()));
+                        nameOfNextLoan = nextLoan.getName();
+                        nextLoan.setOutstandingBalance(nextLoan.getOutstandingBalance().subtract(oneTimeAdditionalContribution));
                         nextLoan.increaseContribution(currentLoan.getContribution());
                         break;
                     }
@@ -55,10 +61,19 @@ public class LoanService {
                 currentLoan.setOutstandingBalance(BigDecimal.ZERO);
                 currentLoan.setContributionToZero();
             } else {
+                BigDecimal fullContribution;
+
+                // use leftover contribution from paid off loan for next highest priority loan
+                if (currentLoan.getName().contentEquals(nameOfNextLoan)) {
+                    fullContribution = currentLoan.getContribution().add(oneTimeAdditionalContribution);
+                } else {
+                    fullContribution = currentLoan.getContribution();
+                }
+
                 // create loan payment receipt
                 paymentReceipt.setLoanName(currentLoan.getName());
                 paymentReceipt.setOutStandingBalance(currentLoan.getOutstandingBalance());
-                paymentReceipt.setContribution(currentLoan.getContribution());
+                paymentReceipt.setContribution(fullContribution);
             }
 
 
