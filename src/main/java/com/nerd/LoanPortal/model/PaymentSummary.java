@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,5 +30,8 @@ public class PaymentSummary implements Serializable {
         for (int i=0; i<numberOfReceipts; i++) {
             paymentReceipts.add(new PaymentReceipt());
         }
+
+        // initialize contribution to zero to avoid NullPointerException
+        paymentReceipts.forEach(paymentReceipt -> paymentReceipt.setContribution(BigDecimal.ZERO));
     }
 }

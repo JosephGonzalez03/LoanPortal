@@ -26,32 +26,41 @@ public class LoanService {
         PaymentSummary paymentSummary = new PaymentSummary();
 
         for (Loan currentLoan : loans) {
+            PaymentReceipt paymentReceipt = new PaymentReceipt();
+
             // make monthly payment on current loan if it is not paid off
             if (currentLoan.getOutstandingBalance().compareTo(BigDecimal.ZERO) == 1) {
                 makeMonthlyPayment(currentLoan);
             }
 
-            // handle when loan is paid off
+            // if loan is paid off
             if (currentLoan.getOutstandingBalance().compareTo(BigDecimal.ZERO) <= 0) {
                 // move contribution and leftover pay to next loan
                 for (Loan nextLoan : loans) {
                     if (!nextLoan.getName().contentEquals(currentLoan.getName()) && nextLoan.getContribution().compareTo(BigDecimal.ZERO) == 1) {
-                        nextLoan.setOutstandingBalance(nextLoan.getOutstandingBalance().add(currentLoan.getOutstandingBalance()));
+                        //nextLoan.setOutstandingBalance(nextLoan.getOutstandingBalance().add(currentLoan.getOutstandingBalance()));
                         nextLoan.increaseContribution(currentLoan.getContribution());
                         break;
                     }
                 }
 
+                // create loan payment receipt
+                BigDecimal finalPaymentAmount = currentLoan.getContribution().add(currentLoan.getOutstandingBalance());
+
+                paymentReceipt.setLoanName(currentLoan.getName());
+                paymentReceipt.setOutStandingBalance(BigDecimal.ZERO);
+                paymentReceipt.setContribution(finalPaymentAmount);
+
                 // zero out outstanding balance & contribution for paid off loan
                 currentLoan.setOutstandingBalance(BigDecimal.ZERO);
                 currentLoan.setContributionToZero();
+            } else {
+                // create loan payment receipt
+                paymentReceipt.setLoanName(currentLoan.getName());
+                paymentReceipt.setOutStandingBalance(currentLoan.getOutstandingBalance());
+                paymentReceipt.setContribution(currentLoan.getContribution());
             }
 
-            // create loan payment receipt
-            PaymentReceipt paymentReceipt = new PaymentReceipt();
-            paymentReceipt.setLoanName(currentLoan.getName());
-            paymentReceipt.setOutStandingBalance(currentLoan.getOutstandingBalance());
-            paymentReceipt.setContribution(currentLoan.getContribution());
 
             // add loan payment receipt to other receipts for the month
             paymentSummary.getPaymentReceipts().add(paymentReceipt);
@@ -71,6 +80,9 @@ public class LoanService {
             // make monthly loan payments
             paymentSummary = makeMonthlyPayments(loanListCopy.getLoans());
 
+            // add monthly loan payment receipts to list
+            paymentSummaries.getPaymentSummaries().add(paymentSummary);
+
             // check if all loans are paid off
             areAllLoansPaidOff = true;
 
@@ -80,28 +92,26 @@ public class LoanService {
                     break;
                 }
             }
-
-            // add monthly loan payment receipts to list
-            paymentSummaries.getPaymentSummaries().add(paymentSummary);
         }
 
         return paymentSummaries;
     }
 
     public PaymentSummary getTotalContributionsSummary(PaymentSummaryList paymentSummaryList) {
-        int numOfLoans = paymentSummaryList.getPaymentSummaries().get(0).getPaymentReceipts().size();
-        PaymentSummary totalContributionSummary = new PaymentSummary(numOfLoans);
+        List<PaymentReceipt> receipts = paymentSummaryList.getPaymentSummaries().get(0).getPaymentReceipts();
+        PaymentSummary totalContributionSummary = new PaymentSummary(receipts.size());
 
         // calculate total contribution for each loan
-        for (int i=0; i<paymentSummaryList.getPaymentSummaries().size(); i++) {
-            PaymentSummary currentPaymentSummary = new PaymentSummary(paymentSummaryList.getPaymentSummaries().get(i).getPaymentReceipts());
+        for (int loanCounter=0; loanCounter < receipts.size(); loanCounter++) {
+            PaymentReceipt currentReceipt = receipts.get(loanCounter);
+            PaymentReceipt currentTotalContributionReceipt = totalContributionSummary.getPaymentReceipts().get(loanCounter);
 
-            for (int j=0; j<currentPaymentSummary.getPaymentReceipts().size(); j++) {
-                PaymentReceipt currentPaymentReceipt = currentPaymentSummary.getPaymentReceipts().get(j);
-                PaymentReceipt currentTotalContributionReceipt = totalContributionSummary.getPaymentReceipts().get(j);
+            for (int summaryCounter=0; summaryCounter < paymentSummaryList.getPaymentSummaries().size(); summaryCounter++) {
+                PaymentSummary currentPaymentSummary = paymentSummaryList.getPaymentSummaries().get(summaryCounter);
+                PaymentReceipt currentPaymentSummaryReceipt = currentPaymentSummary.getPaymentReceipts().get(loanCounter);
 
-                currentTotalContributionReceipt.setLoanName(currentPaymentReceipt.getLoanName());
-                currentTotalContributionReceipt.setContribution(currentTotalContributionReceipt.getContribution().add(currentPaymentReceipt.getContribution()));
+                currentTotalContributionReceipt.setLoanName(currentReceipt.getLoanName());
+                currentTotalContributionReceipt.setContribution(currentTotalContributionReceipt.getContribution().add(currentPaymentSummaryReceipt.getContribution()));
             }
         }
 
