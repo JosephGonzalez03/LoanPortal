@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -29,12 +28,18 @@ public class Loan implements Serializable {
     @Digits(integer=10, fraction=2)
     private BigDecimal contribution;
 
+    @Digits(integer=10, fraction=2)
+    private BigDecimal oneTimeAdditionalContribution;
+
+    private boolean isPaidOff;
+
+    public Loan() {
+        this.oneTimeAdditionalContribution = BigDecimal.ZERO;
+    }
+
     public void increaseContribution(BigDecimal amount) {
         if(amount.compareTo(BigDecimal.ZERO) == 1) {
             contribution = contribution.add(amount);
         }
-    }
-    public void setContributionToZero() {
-        contribution = BigDecimal.ZERO;
     }
 }

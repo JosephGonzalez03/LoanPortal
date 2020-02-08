@@ -84,15 +84,15 @@ public class LoanPortalController {
     }
 
     @GetMapping("/loans/calculate")
-    public String calculateLoanPayments(Model model) {
+    public String calculateLoanPayments(Model model, @RequestParam(defaultValue = "default") String orderBy) {
         RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        LoanList loanList = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, "interest_rate");
-
+        LoanList loanList = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, orderBy);
+        LoanList alphabeticallyOrdered = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, "name");
         PaymentSummaryList paymentSummaryList = loanService.getPaymentSummaries(loanList);
 
         // populate loans table
-        model.addAttribute("loans", loanList.getLoans());
+        model.addAttribute("loans", alphabeticallyOrdered.getLoans());
 
         // populate payment summary table
         model.addAttribute("paymentSummaryList", paymentSummaryList);

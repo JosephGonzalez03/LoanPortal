@@ -15,85 +15,104 @@ public class LoanService {
         BigDecimal currentAmount = loan.getOutstandingBalance(),
                 interestRate = loan.getInterestRate(),
                 contribution = loan.getContribution(),
+                oneTimeAdditionalContribution = loan.getOneTimeAdditionalContribution(),
                 yearlyAccruedInterest = currentAmount.multiply(interestRate.movePointLeft(2)),
-                monthlyAccruedInterest = yearlyAccruedInterest.divide(BigDecimal.valueOf(12), new MathContext(2)),
-                loanAmountAfterPayment = currentAmount.add(monthlyAccruedInterest).subtract(contribution).setScale(2, RoundingMode.HALF_EVEN);
+                monthlyAccruedInterest = yearlyAccruedInterest.divide(BigDecimal.valueOf(12), new MathContext(4)),
+                loanAmountAfterPayment = currentAmount.add(monthlyAccruedInterest).subtract(contribution).subtract(oneTimeAdditionalContribution).setScale(2, RoundingMode.HALF_EVEN);
 
         loan.setOutstandingBalance(loanAmountAfterPayment);
+        loan.setOneTimeAdditionalContribution(BigDecimal.ZERO);
     }
 
     private PaymentSummary makeMonthlyPayments(List<Loan> loans) {
-        BigDecimal oneTimeAdditionalContribution = BigDecimal.ZERO;
-        String nameOfNextLoan = new String();
+        //LoanList loanListCopy = new LoanList(loans);
         PaymentSummary paymentSummary = new PaymentSummary();
+        BigDecimal mPaidOffLoanContribution = BigDecimal.ZERO;
+        BigDecimal oneTimeAdditionalContribution = BigDecimal.ZERO;
 
         for (Loan currentLoan : loans) {
             PaymentReceipt paymentReceipt = new PaymentReceipt();
 
             // make monthly payment on current loan if it is not paid off
-            if (currentLoan.getOutstandingBalance().compareTo(BigDecimal.ZERO) == 1) {
+            if (!currentLoan.isPaidOff()) {
                 makeMonthlyPayment(currentLoan);
             }
 
-            // if loan is paid off
-            if (currentLoan.getOutstandingBalance().compareTo(BigDecimal.ZERO) <= 0) {
-                // save leftover contribution from paid off loan
+            // if loan is paid off, but not declared as paid off
+            if (currentLoan.getOutstandingBalance().compareTo(BigDecimal.ZERO) <= 0 && !currentLoan.isPaidOff()) {
+                // declare loan as paid off
+                currentLoan.setPaidOff(true);
+
                 oneTimeAdditionalContribution = currentLoan.getOutstandingBalance().abs();
 
-                // move contribution and leftover pay to next loan
-                for (Loan nextLoan : loans) {
-                    if (!nextLoan.getName().contentEquals(currentLoan.getName()) && nextLoan.getContribution().compareTo(BigDecimal.ZERO) == 1) {
-                        nameOfNextLoan = nextLoan.getName();
-                        nextLoan.setOutstandingBalance(nextLoan.getOutstandingBalance().subtract(oneTimeAdditionalContribution));
-                        nextLoan.increaseContribution(currentLoan.getContribution());
+                // create final payment receipt
+                paymentReceipt.setLoanName(currentLoan.getName());
+                paymentReceipt.setOutstandingBalance(BigDecimal.ZERO);
+                paymentReceipt.setContribution(currentLoan.getContribution().subtract(oneTimeAdditionalContribution));
+
+                // find next highest priority loan
+                for (Loan nextHighestPriorityLoan : loans) {
+                    if (!nextHighestPriorityLoan.isPaidOff()) {
+                        // add leftover contribution from paid off loan to one time additional contribution of next highest priority loan
+                        nextHighestPriorityLoan.setOneTimeAdditionalContribution(oneTimeAdditionalContribution);
+
+                        /* if the receipt was already created:
+                        *   -update outstanding balance on the loan & receipt
+                        *   -update contribution on next highest priority loan for next payment
+                        * */
+                        boolean isAlreadyCreated = false;
+
+                        for (PaymentReceipt receipt: paymentSummary.getPaymentReceipts()) {
+                            if (receipt.getLoanName().contentEquals(nextHighestPriorityLoan.getName())) {
+                                isAlreadyCreated = true;
+
+                                nextHighestPriorityLoan.setContribution(nextHighestPriorityLoan.getContribution().add(currentLoan.getContribution()));
+                                receipt.setOutstandingBalance(nextHighestPriorityLoan.getOutstandingBalance());
+                                receipt.setContribution(receipt.getContribution().add(oneTimeAdditionalContribution));
+                                break;
+                            }
+                        }
+
+                        if (!isAlreadyCreated) {
+                            mPaidOffLoanContribution = currentLoan.getContribution();
+                        }
+
                         break;
                     }
                 }
 
-                // create loan payment receipt
-                BigDecimal finalPaymentAmount = currentLoan.getContribution().add(currentLoan.getOutstandingBalance());
-
-                paymentReceipt.setLoanName(currentLoan.getName());
-                paymentReceipt.setOutStandingBalance(BigDecimal.ZERO);
-                paymentReceipt.setContribution(finalPaymentAmount);
-
-                // zero out outstanding balance & contribution for paid off loan
+                // set outstanding balance & contribution for paid off loan to zero
                 currentLoan.setOutstandingBalance(BigDecimal.ZERO);
-                currentLoan.setContributionToZero();
+                currentLoan.setContribution(BigDecimal.ZERO);
             } else {
-                BigDecimal fullContribution;
+                // create loan payment receipt
+                paymentReceipt.setLoanName(currentLoan.getName());
+                paymentReceipt.setOutstandingBalance(currentLoan.getOutstandingBalance());
+                paymentReceipt.setContribution(currentLoan.getContribution());
 
-                // use leftover contribution from paid off loan for next highest priority loan
-                if (currentLoan.getName().contentEquals(nameOfNextLoan)) {
-                    fullContribution = currentLoan.getContribution().add(oneTimeAdditionalContribution);
-                } else {
-                    fullContribution = currentLoan.getContribution();
+                // update contribution on next highest priority (current) loan for next payment & current receipt
+                if (mPaidOffLoanContribution.compareTo(BigDecimal.ZERO) > 0) {
+                    currentLoan.setContribution(currentLoan.getContribution().add(mPaidOffLoanContribution));
+                    paymentReceipt.setContribution(paymentReceipt.getContribution().add(oneTimeAdditionalContribution));
+                    mPaidOffLoanContribution = BigDecimal.ZERO;
                 }
 
-                // create loan payment receipt
-                paymentReceipt.setLoanName(currentLoan.getName());
-                paymentReceipt.setOutStandingBalance(currentLoan.getOutstandingBalance());
-                paymentReceipt.setContribution(fullContribution);
             }
-
 
             // add loan payment receipt to other receipts for the month
             paymentSummary.getPaymentReceipts().add(paymentReceipt);
         }
-
         return paymentSummary;
     }
 
     public PaymentSummaryList getPaymentSummaries(LoanList loanList) {
-        LoanList loanListCopy = new LoanList(loanList.getLoans());
-
         boolean areAllLoansPaidOff = false;
         PaymentSummary paymentSummary;
         PaymentSummaryList paymentSummaries = new PaymentSummaryList();
 
         while (!areAllLoansPaidOff) {
             // make monthly loan payments
-            paymentSummary = makeMonthlyPayments(loanListCopy.getLoans());
+            paymentSummary = makeMonthlyPayments(loanList.getLoans());
 
             // add monthly loan payment receipts to list
             paymentSummaries.getPaymentSummaries().add(paymentSummary);
@@ -101,7 +120,7 @@ public class LoanService {
             // check if all loans are paid off
             areAllLoansPaidOff = true;
 
-            for (Loan loan : loanListCopy.getLoans()) {
+            for (Loan loan : loanList.getLoans()) {
                 if (loan.getContribution().compareTo(BigDecimal.ZERO) == 1) {
                     areAllLoansPaidOff = false;
                     break;

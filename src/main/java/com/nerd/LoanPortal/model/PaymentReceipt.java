@@ -16,7 +16,7 @@ public class PaymentReceipt implements Serializable {
     String loanName;
 
     @Digits(integer=10, fraction=2)
-    BigDecimal outStandingBalance;
+    BigDecimal outstandingBalance;
 
     @Digits(integer=10, fraction=2)
     BigDecimal contribution;

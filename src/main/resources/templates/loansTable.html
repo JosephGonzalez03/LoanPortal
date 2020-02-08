@@ -45,24 +45,25 @@
         <div class="btn-group">
             <input type="button" class="btn btn-primary" onclick="location.href='edit'" value="Edit">
         </div>
-        <div class="btn-group">
-            <input type="button" class="btn btn-primary" onclick="location.href='calculate'" value="Calculate">
-        </div>
     </div>
 
-    <div class="btn-group btn-group-md">
-        <div class="dropdown">
-            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                Order By
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" th:href="@{/loans(orderBy='name')}"> Name </a>
-                <a class="dropdown-item" th:href="@{/loans(orderBy='interest_rate')}"> Interest Rate </a>
-                <a class="dropdown-item" th:href="@{/loans(orderBy='outstanding_balance')}"> Outstanding Balance </a>
-                <a class="dropdown-item" th:href="@{/loans(orderBy='contribution')}"> Contribution </a>
-            </div>
+    <form action="#" th:action="@{/loans/calculate}">
+        <div class="radio">
+            <label><input type="radio" name="orderBy" th:value="name"> Name </label>
         </div>
-    </div>
+        <div class="radio">
+            <label><input type="radio" name="orderBy" th:value="interest_rate"> Interest Rate</label>
+        </div>
+        <div class="radio">
+            <label><input type="radio" name="orderBy" th:value="outstanding_balance"> Outstanding Balance </label>
+        </div>
+        <div class="radio">
+            <label><input type="radio" name="orderBy" th:value="contribution"> Contribution </label>
+        </div>
+        <div class="btn-group">
+            <input type="submit" class="btn btn-primary" id="orderButton" th:value="Calculate">
+        </div>
+    </form>
 
     <br>
     <br>
@@ -104,7 +105,7 @@
             <tr th:each="paymentSummary, itemStat : ${paymentSummaryList.paymentSummaries}">
                 <td><span th:text="${itemStat.index + 1}"></span></td>
                 <td th:each="paymentReceipt : ${paymentSummary.paymentReceipts}">
-                    <span th:text="${paymentReceipt.outStandingBalance}"> 0.00 </span>
+                    <span th:text="${paymentReceipt.outstandingBalance}"> 0.00 </span>
                 </td>
             </tr>
             </tbody>
