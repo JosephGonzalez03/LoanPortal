@@ -1,5 +1,6 @@
-package com.nerd.LoanPortal.model;
+package com.nerd.LoanPortal.configuration;
 
+import com.nerd.LoanPortal.configuration.RestTemplateProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

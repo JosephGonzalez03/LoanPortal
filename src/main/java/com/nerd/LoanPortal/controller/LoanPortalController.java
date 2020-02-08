@@ -1,5 +1,7 @@
 package com.nerd.LoanPortal.controller;
 
+import com.nerd.LoanPortal.configuration.RestTemplateConfiguration;
+import com.nerd.LoanPortal.configuration.RestTemplateProperties;
 import com.nerd.LoanPortal.model.*;
 import com.nerd.LoanPortal.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
