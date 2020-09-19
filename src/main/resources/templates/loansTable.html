@@ -49,16 +49,16 @@
 
     <form action="#" th:action="@{/loans/calculate}">
         <div class="radio">
-            <label><input type="radio" name="orderBy" th:value="name"> Name </label>
+            <label><input type="radio" name="orderBy" th:value="NAME"> Name </label>
         </div>
         <div class="radio">
-            <label><input type="radio" name="orderBy" th:value="interest_rate"> Interest Rate</label>
+            <label><input type="radio" name="orderBy" th:value="INTEREST_RATE"> Interest Rate</label>
         </div>
         <div class="radio">
-            <label><input type="radio" name="orderBy" th:value="outstanding_balance"> Outstanding Balance </label>
+            <label><input type="radio" name="orderBy" th:value="OUTSTANDING_BALANCE"> Outstanding Balance </label>
         </div>
         <div class="radio">
-            <label><input type="radio" name="orderBy" th:value="contribution"> Contribution </label>
+            <label><input type="radio" name="orderBy" th:value="CONTRIBUTION"> Contribution </label>
         </div>
         <div class="btn-group">
             <input type="submit" class="btn btn-primary" id="orderButton" th:value="Calculate">

@@ -5,6 +5,7 @@ import com.nerd.LoanPortal.configuration.RestTemplateProperties;
 import com.nerd.LoanPortal.model.*;
 import com.nerd.LoanPortal.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -26,13 +28,13 @@ public class LoanPortalController {
     private LoanService loanService;
 
     @GetMapping("/loans")
-    public String orderedLoans(RedirectAttributes redirectAttributes, @RequestParam(defaultValue = "default") String orderBy) {
+    public String orderedLoans(RedirectAttributes redirectAttributes, @RequestParam(defaultValue = "NAME") String orderBy) {
         RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        LoanList loanList = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, orderBy);
+        ResponseEntity<Loan[]> orderedLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, orderBy);
 
         redirectAttributes.addFlashAttribute("raPaymentSummaryList", new PaymentSummaryList());
-        redirectAttributes.addFlashAttribute("raLoans", loanList.getLoans());
+        redirectAttributes.addFlashAttribute("raLoans", Arrays.asList(orderedLoans.getBody()));
         return "redirect:/loans/all";
     }
 
@@ -48,15 +50,15 @@ public class LoanPortalController {
     public String newLoansForm(Model model) {
         Loan newLoan = new Loan();
 
-        model.addAttribute("loanForm", newLoan);
+        model.addAttribute("newLoan", newLoan);
         return "newLoansForm";
     }
 
     @PostMapping("/loans/new/save")
-    public String saveNewLoans(@ModelAttribute Loan loanForm) {
+    public String saveNewLoans(@ModelAttribute Loan newLoan) {
         RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        loanRT.postForObject("/users/1/loans", loanForm, Loan.class);
+        loanRT.postForObject("/users/1/loans", newLoan, Loan.class);
         return "redirect:/loans";
     }
 
@@ -64,21 +66,20 @@ public class LoanPortalController {
     public String editLoansForm(Model model) {
         RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        LoanList loanList = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, "default");
+        ResponseEntity<Loan[]> orderedLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, "NAME");
 
-        model.addAttribute("loansForm", loanList);
+        model.addAttribute("editedLoans", Arrays.asList(orderedLoans.getBody()));
         model.addAttribute("loan", new Loan());
         return "editLoansForm";
     }
 
     @PostMapping("/loans/edit/save")
-    public String saveEditedLoans(@ModelAttribute LoanList loanList) {
+    public String saveEditedLoans(@ModelAttribute LoanForm editedLoans) {
         RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        List<Loan> loans = loanList.getLoans();
 
-        for (int i=0; i<loans.size(); i++) {
-            Loan currentLoan = loans.get(i);
+        for (int i=0; i<editedLoans.getLoans().size(); i++) {
+            Loan currentLoan = editedLoans.getLoans().get(i);
             loanRT.put("/users/1/loans/" + currentLoan.getId(), currentLoan);
         }
 
@@ -86,15 +87,15 @@ public class LoanPortalController {
     }
 
     @GetMapping("/loans/calculate")
-    public String calculateLoanPayments(Model model, @RequestParam(defaultValue = "default") String orderBy) {
+    public String calculateLoanPayments(Model model, @RequestParam(defaultValue = "NAME") String orderBy) {
         RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        LoanList loanList = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, orderBy);
-        LoanList alphabeticallyOrdered = loanRT.getForObject("/users/1/loans?orderBy={orderBy}", LoanList.class, "name");
-        PaymentSummaryList paymentSummaryList = loanService.getPaymentSummaries(loanList);
+        ResponseEntity<Loan[]> orderedLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, orderBy);
+        ResponseEntity<Loan[]> orderedAlphabeticallyLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, "NAME");
+        PaymentSummaryList paymentSummaryList = loanService.getPaymentSummaries(Arrays.asList(orderedLoans.getBody()));
 
         // populate loans table
-        model.addAttribute("loans", alphabeticallyOrdered.getLoans());
+        model.addAttribute("loans", Arrays.asList(orderedAlphabeticallyLoans.getBody()));
 
         // populate payment summary table
         model.addAttribute("paymentSummaryList", paymentSummaryList);

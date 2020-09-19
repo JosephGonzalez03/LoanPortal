@@ -12,7 +12,7 @@
 </head>
 <body>
 <div class="container-fluid">
-    <form action="#" th:action="@{/loans/new/save}" th:object="${loanForm}" method="post">
+    <form action="#" th:action="@{/loans/new/save}" th:object="${newLoan}" method="post">
         <div class="btn-group btn-group-md btn-group-justified">
             <div class="btn-group">
                 <input type="submit" class="btn btn-primary" id="submitButton" th:value="Save">

@@ -10,6 +10,6 @@ import java.util.List;
 
 @NoArgsConstructor
 @Getter @Setter
-public class LoanList implements Serializable {
+public class LoanForm implements Serializable {
     List<Loan> loans = new ArrayList<>();
 }

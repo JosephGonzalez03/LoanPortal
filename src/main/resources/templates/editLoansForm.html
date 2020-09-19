@@ -12,7 +12,7 @@
 </head>
 <body>
 <div class="container-fluid container-md">
-    <form action="#" th:action="@{/loans/edit/save}" th:object="${loansForm}" method="post">
+    <form action="#" th:action="@{/loans/edit/save}" th:object="${editedLoans}" method="post">
         <table class="table table-striped table-bordered table-condensed table-sm">
             <thead>
             <tr>
@@ -23,7 +23,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="loan, itemStat : ${loansForm.loans}">
+            <tr th:each="loan, itemStat : ${editedLoans}">
                 <td hidden><input type="number" class="form-control form-control-sm" th:name="|loans[${itemStat.index}].id|"
                                   th:value="${loan.getId()}"/>
                 </td>

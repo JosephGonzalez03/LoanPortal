@@ -105,14 +105,14 @@ public class LoanService {
         return paymentSummary;
     }
 
-    public PaymentSummaryList getPaymentSummaries(LoanList loanList) {
+    public PaymentSummaryList getPaymentSummaries(List<Loan> loans) {
         boolean areAllLoansPaidOff = false;
         PaymentSummary paymentSummary;
         PaymentSummaryList paymentSummaries = new PaymentSummaryList();
 
         while (!areAllLoansPaidOff) {
             // make monthly loan payments
-            paymentSummary = makeMonthlyPayments(loanList.getLoans());
+            paymentSummary = makeMonthlyPayments(loans);
 
             // add monthly loan payment receipts to list
             paymentSummaries.getPaymentSummaries().add(paymentSummary);
@@ -120,7 +120,7 @@ public class LoanService {
             // check if all loans are paid off
             areAllLoansPaidOff = true;
 
-            for (Loan loan : loanList.getLoans()) {
+            for (Loan loan : loans) {
                 if (loan.getContribution().compareTo(BigDecimal.ZERO) == 1) {
                     areAllLoansPaidOff = false;
                     break;
