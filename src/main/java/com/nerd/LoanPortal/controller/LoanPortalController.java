@@ -30,8 +30,8 @@ public class LoanPortalController {
     @GetMapping("/loans")
     public String orderedLoans(RedirectAttributes redirectAttributes, @RequestParam(defaultValue = "NAME") String orderBy) {
         HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
-        RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        ResponseEntity<Loan[]> orderedLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, orderBy);
+        RestTemplate loanSystemApi = restTemplateConfiguration.restTemplate(properties);
+        ResponseEntity<Loan[]> orderedLoans = loanSystemApi.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, orderBy);
 
         redirectAttributes.addFlashAttribute("raPaymentSummaryList", new PaymentSummaryList());
         redirectAttributes.addFlashAttribute("raLoans", Arrays.asList(orderedLoans.getBody()));
@@ -57,16 +57,16 @@ public class LoanPortalController {
     @PostMapping("/loans/new/save")
     public String saveNewLoans(@ModelAttribute Loan newLoan) {
         HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
-        RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        loanRT.postForObject("/users/1/loans", newLoan, Loan.class);
+        RestTemplate loanSystemApi = restTemplateConfiguration.restTemplate(properties);
+        loanSystemApi.postForObject("/users/1/loans", newLoan, Loan.class);
         return "redirect:/loans";
     }
 
     @GetMapping("/loans/edit")
     public String editLoansForm(Model model) {
         HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
-        RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        ResponseEntity<Loan[]> orderedLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, "NAME");
+        RestTemplate loanSystemApi = restTemplateConfiguration.restTemplate(properties);
+        ResponseEntity<Loan[]> orderedLoans = loanSystemApi.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, "NAME");
 
         model.addAttribute("editedLoans", Arrays.asList(orderedLoans.getBody()));
         model.addAttribute("loan", new Loan());
@@ -76,11 +76,11 @@ public class LoanPortalController {
     @PostMapping("/loans/edit/save")
     public String saveEditedLoans(@ModelAttribute LoanForm editedLoans) {
         HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
-        RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
+        RestTemplate loanSystemApi = restTemplateConfiguration.restTemplate(properties);
 
         for (int i=0; i<editedLoans.getLoans().size(); i++) {
             Loan currentLoan = editedLoans.getLoans().get(i);
-            loanRT.put("/users/1/loans/" + currentLoan.getId(), currentLoan);
+            loanSystemApi.put("/users/1/loans/" + currentLoan.getId(), currentLoan);
         }
 
         return "redirect:/loans";
@@ -89,9 +89,9 @@ public class LoanPortalController {
     @GetMapping("/loans/calculate")
     public String calculateLoanPayments(Model model, @RequestParam(defaultValue = "NAME") String orderBy) {
         HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
-        RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
-        ResponseEntity<Loan[]> orderedLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, orderBy);
-        ResponseEntity<Loan[]> orderedAlphabeticallyLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, "NAME");
+        RestTemplate loanSystemApi = restTemplateConfiguration.restTemplate(properties);
+        ResponseEntity<Loan[]> orderedLoans = loanSystemApi.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, orderBy);
+        ResponseEntity<Loan[]> orderedAlphabeticallyLoans = loanSystemApi.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, "NAME");
         PaymentSummaryList paymentSummaryList = loanService.getPaymentSummaries(Arrays.asList(orderedLoans.getBody()));
 
         // populate loans table
