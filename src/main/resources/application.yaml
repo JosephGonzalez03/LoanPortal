@@ -4,13 +4,19 @@ server:
   port: "8091"
 
 loan-system-api:
-  protocol: "http"
-  host: "localhost"
-  port: "8090"
-  baseUri: "/loanms"
-
+  local:
+    protocol: "http"
+    host: "localhost"
+    port: "8090"
+    baseUri: "/loanms"
+  mock:
+    protocol: "https"
+    host: "31418c73-a5d9-44de-b75b-aa15d92b6199.mock.pstmn.io"
+    port: "443"
+    basePath: ""
 payment-process-api:
-  protocol: "http"
-  host: "localhost"
-  port: "8090"
-  baseUri: "/paymentms"
+  local:
+    protocol: "http"
+    host: "localhost"
+    port: "8090"
+    baseUri: "/paymentms"
