@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,15 +34,15 @@ public class LoanPortalController {
         RestTemplate loanSystemApi = restTemplateConfiguration.restTemplate(properties);
         ResponseEntity<Loan[]> orderedLoans = loanSystemApi.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, orderBy);
 
-        redirectAttributes.addFlashAttribute("raPaymentSummaryList", new PaymentSummaryList());
+        redirectAttributes.addFlashAttribute("raPaymentSummaries", new ArrayList<PaymentSummary>());
         redirectAttributes.addFlashAttribute("raLoans", Arrays.asList(orderedLoans.getBody()));
         return "redirect:/loans/all";
     }
 
     @GetMapping("/loans/all")
-    public String main(Model model, @ModelAttribute("raLoans") List<Loan> loans, @ModelAttribute("raPaymentSummaryList") PaymentSummaryList paymentSummaryList) {
+    public String main(Model model, @ModelAttribute("raLoans") List<Loan> loans, @ModelAttribute("raPaymentSummaries") List<PaymentSummary> paymentSummaries) {
         model.addAttribute("loans", loans);
-        model.addAttribute("paymentSummaryList", paymentSummaryList);
+        model.addAttribute("paymentSummaryList", paymentSummaries);
         return "loansTable";
     }
 
