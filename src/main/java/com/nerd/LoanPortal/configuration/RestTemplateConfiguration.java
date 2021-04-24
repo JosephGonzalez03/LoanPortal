@@ -1,6 +1,5 @@
 package com.nerd.LoanPortal.configuration;
 
-import com.nerd.LoanPortal.configuration.RestTemplateProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +22,6 @@ public class RestTemplateConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "loan-api")
-    public RestTemplateProperties loanApiProperties() { return new RestTemplateProperties(); }
+    @ConfigurationProperties(prefix = "loan-system-api")
+    public HttpProperties loanSystemApiProperties() { return new HttpProperties(); }
 }

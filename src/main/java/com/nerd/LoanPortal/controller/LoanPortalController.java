@@ -1,7 +1,7 @@
 package com.nerd.LoanPortal.controller;
 
 import com.nerd.LoanPortal.configuration.RestTemplateConfiguration;
-import com.nerd.LoanPortal.configuration.RestTemplateProperties;
+import com.nerd.LoanPortal.configuration.HttpProperties;
 import com.nerd.LoanPortal.model.*;
 import com.nerd.LoanPortal.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class LoanPortalController {
 
     @GetMapping("/loans")
     public String orderedLoans(RedirectAttributes redirectAttributes, @RequestParam(defaultValue = "NAME") String orderBy) {
-        RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
+        HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
         ResponseEntity<Loan[]> orderedLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, orderBy);
 
@@ -56,7 +56,7 @@ public class LoanPortalController {
 
     @PostMapping("/loans/new/save")
     public String saveNewLoans(@ModelAttribute Loan newLoan) {
-        RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
+        HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
         loanRT.postForObject("/users/1/loans", newLoan, Loan.class);
         return "redirect:/loans";
@@ -64,7 +64,7 @@ public class LoanPortalController {
 
     @GetMapping("/loans/edit")
     public String editLoansForm(Model model) {
-        RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
+        HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
         ResponseEntity<Loan[]> orderedLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, "NAME");
 
@@ -75,7 +75,7 @@ public class LoanPortalController {
 
     @PostMapping("/loans/edit/save")
     public String saveEditedLoans(@ModelAttribute LoanForm editedLoans) {
-        RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
+        HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
 
         for (int i=0; i<editedLoans.getLoans().size(); i++) {
@@ -88,7 +88,7 @@ public class LoanPortalController {
 
     @GetMapping("/loans/calculate")
     public String calculateLoanPayments(Model model, @RequestParam(defaultValue = "NAME") String orderBy) {
-        RestTemplateProperties properties = restTemplateConfiguration.loanApiProperties();
+        HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
         RestTemplate loanRT = restTemplateConfiguration.restTemplate(properties);
         ResponseEntity<Loan[]> orderedLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, orderBy);
         ResponseEntity<Loan[]> orderedAlphabeticallyLoans = loanRT.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, "NAME");
