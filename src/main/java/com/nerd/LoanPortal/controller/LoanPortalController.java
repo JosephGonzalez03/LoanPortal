@@ -88,20 +88,29 @@ public class LoanPortalController {
 
     @GetMapping("/loans/calculate")
     public String calculateLoanPayments(Model model, @RequestParam(defaultValue = "NAME") String orderBy) {
+        // create loan system api rest template
         HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
         RestTemplate loanSystemApi = restTemplateConfiguration.restTemplate(properties);
+
+        // create payment process api rest template
+        properties = restTemplateConfiguration.paymentProcessApiProperties();
+        RestTemplate paymentProcessApi = restTemplateConfiguration.restTemplate(properties);
+
+        // request ordered loans
         ResponseEntity<Loan[]> orderedLoans = loanSystemApi.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, orderBy);
         ResponseEntity<Loan[]> orderedAlphabeticallyLoans = loanSystemApi.getForEntity("/users/1/loans?orderBy={orderBy}", Loan[].class, "NAME");
-        PaymentSummaryList paymentSummaryList = loanService.getPaymentSummaries(Arrays.asList(orderedLoans.getBody()));
+
+        // request payment summaries
+        ResponseEntity<PaymentSummary[]> paymentSummaries = paymentProcessApi.getForEntity("/users/1/paymentSummaries?operation=FORECAST&orderBy={orderBy}", PaymentSummary[].class, orderBy);
 
         // populate loans table
         model.addAttribute("loans", Arrays.asList(orderedAlphabeticallyLoans.getBody()));
 
         // populate payment summary table
-        model.addAttribute("paymentSummaryList", paymentSummaryList);
+        model.addAttribute("paymentSummaries", Arrays.asList(paymentSummaries.getBody()));
 
         // populate total contributions summary
-        model.addAttribute("totalContributionsSummary", loanService.getTotalContributionsSummary(paymentSummaryList));
+        model.addAttribute("totalContributionsSummary", loanService.getTotalContributionsSummary(Arrays.asList(paymentSummaries.getBody())));
 
         return "loansTable";
     }

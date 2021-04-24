@@ -68,7 +68,7 @@
     <br>
     <br>
 
-    <div th:if="${!paymentSummaryList.paymentSummaries.empty}">
+    <div th:if="${!paymentSummaries.empty}">
         <td>
             <span> Total Contributions </span>
         </td>
@@ -96,13 +96,13 @@
             <thead>
             <tr>
                 <th><span> Month </span></th>
-                <th th:each="paymentReceipt : ${paymentSummaryList.paymentSummaries[0].paymentReceipts}">
+                <th th:each="paymentReceipt : ${paymentSummaries[0].paymentReceipts}">
                     <span th:text="${paymentReceipt.loanName}"> Loan Name </span>
                 </th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="paymentSummary, itemStat : ${paymentSummaryList.paymentSummaries}">
+            <tr th:each="paymentSummary, itemStat : ${paymentSummaries}">
                 <td><span th:text="${itemStat.index + 1}"></span></td>
                 <td th:each="paymentReceipt : ${paymentSummary.paymentReceipts}">
                     <span th:text="${paymentReceipt.outstandingBalance}"> 0.00 </span>
