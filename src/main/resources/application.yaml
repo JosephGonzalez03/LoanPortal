@@ -8,3 +8,9 @@ loan-system-api:
   host: "localhost"
   port: "8090"
   baseUri: "/loanms"
+
+payment-process-api:
+  protocol: "http"
+  host: "localhost"
+  port: "8090"
+  baseUri: "/paymentms"

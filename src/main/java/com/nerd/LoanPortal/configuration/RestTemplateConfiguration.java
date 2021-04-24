@@ -24,4 +24,8 @@ public class RestTemplateConfiguration {
     @Bean
     @ConfigurationProperties(prefix = "loan-system-api")
     public HttpProperties loanSystemApiProperties() { return new HttpProperties(); }
+
+    @Bean
+    @ConfigurationProperties(prefix = "payment-process-api")
+    public HttpProperties paymentProcessApiProperties() { return new HttpProperties(); }
 }
