@@ -1,0 +1,10 @@
+server:
+  servlet:
+    context-path: "/portal"
+  port: "8091"
+
+loan-system-api:
+  protocol: "http"
+  host: "localhost"
+  port: "8090"
+  baseUri: "/loanms"
