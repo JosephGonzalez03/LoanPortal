@@ -42,7 +42,7 @@ public class LoanPortalController {
     @GetMapping("/loans/all")
     public String main(Model model, @ModelAttribute("raLoans") List<Loan> loans, @ModelAttribute("raPaymentSummaries") List<PaymentSummary> paymentSummaries) {
         model.addAttribute("loans", loans);
-        model.addAttribute("paymentSummaryList", paymentSummaries);
+        model.addAttribute("paymentSummaries", paymentSummaries);
         return "loansTable";
     }
 
