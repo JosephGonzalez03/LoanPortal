@@ -10,11 +10,12 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 @Configuration
 public class RestTemplateConfiguration {
 
-    public RestTemplate restTemplate(RestTemplateProperties properties) {
+    public RestTemplate restTemplate(HttpProperties properties) {
         RestTemplate restTemplate = new RestTemplate();
 
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory((
-            properties.getHostName() +
+            properties.getProtocol() + "://" +
+            properties.getHost() + ":" +
             properties.getPort() +
             properties.getBaseUri()
         )));
