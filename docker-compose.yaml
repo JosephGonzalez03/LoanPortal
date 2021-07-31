@@ -1,0 +1,42 @@
+version: "3.4"
+
+services:
+  postgres-db:
+    container_name: postgres
+    image: library/postgres:alpine
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "admin"
+    ports:
+      - "5432:5432"
+
+  loan-system-api:
+    container_name: loan-system-api
+    image: josephgonzalez03/loan-system-api:0.0.1-SNAPSHOT
+    depends_on:
+    - postgres-db
+    ports:
+    - "8090:8090"
+
+  payment-process-api:
+    container_name: payment-process-api
+    image: josephgonzalez03/payment-process-api:0.0.1-SNAPSHOT
+    environment:
+      LOAN_SYSTEM_API_HOST: "loan-system-api"
+    depends_on:
+      - loan-system-api
+    ports:
+      - "8092:8090"
+
+  loan-portal:
+      container_name: loan-portal
+      image: josephgonzalez03/loanportal_loan-portal:latest
+      environment:
+        LOAN_SYSTEM_API_HOST: "loan-system-api"
+        PAYMENT_PROCESS_API_HOST: "payment-process-api"
+      depends_on:
+        - loan-system-api
+        - payment-process-api
+      ports:
+        - "8093:8090"

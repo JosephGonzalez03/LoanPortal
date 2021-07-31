@@ -22,7 +22,7 @@ public class RestTemplateConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "loan-system-api.mock")
+    @ConfigurationProperties(prefix = "loan-system-api.local")
     public HttpProperties loanSystemApiProperties() { return new HttpProperties(); }
 
     @Bean

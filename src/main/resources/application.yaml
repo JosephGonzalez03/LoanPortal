@@ -1,12 +1,12 @@
 server:
   servlet:
     context-path: "/portal"
-  port: "8091"
+  port: "8090"
 
 loan-system-api:
   local:
     protocol: "http"
-    host: "localhost"
+    host: "${LOAN_SYSTEM_API_HOST}"
     port: "8090"
     baseUri: "/loanms"
   mock:
@@ -17,6 +17,6 @@ loan-system-api:
 payment-process-api:
   local:
     protocol: "http"
-    host: "localhost"
+    host: "${PAYMENT_PROCESS_API_HOST}"
     port: "8090"
     baseUri: "/paymentms"
