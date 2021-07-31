@@ -31,7 +31,8 @@ services:
 
   loan-portal:
       container_name: loan-portal
-      image: josephgonzalez03/loanportal_loan-portal:latest
+      build:
+        context: .
       environment:
         LOAN_SYSTEM_API_HOST: "loan-system-api"
         PAYMENT_PROCESS_API_HOST: "payment-process-api"
