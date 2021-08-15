@@ -16,7 +16,7 @@ public class RestTemplateConfiguration {
             properties.getProtocol() + "://" +
             properties.getHost() + ":" +
             properties.getPort() +
-            properties.getBaseUri()
+            properties.getBasePath()
         )));
         return restTemplate;
     }
