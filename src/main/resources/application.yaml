@@ -8,7 +8,7 @@ loan-system-api:
     protocol: "http"
     host: "${LOAN_SYSTEM_API_HOST}"
     port: "8090"
-    baseUri: "/loanms"
+    basePath: "/loanms"
   mock:
     protocol: "https"
     host: "31418c73-a5d9-44de-b75b-aa15d92b6199.mock.pstmn.io"
@@ -19,4 +19,4 @@ payment-process-api:
     protocol: "http"
     host: "${PAYMENT_PROCESS_API_HOST}"
     port: "8090"
-    baseUri: "/paymentms"
+    basePath: "/paymentms"

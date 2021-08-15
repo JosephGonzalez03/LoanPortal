@@ -11,5 +11,5 @@ public class HttpProperties {
     private String protocol;
     private String host;
     private Integer port;
-    private String baseUri;
+    private String basePath;
 }
