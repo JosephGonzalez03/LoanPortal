@@ -28,6 +28,11 @@ public class LoanPortalController {
     @Autowired
     private LoanService loanService;
 
+    @GetMapping
+    public String portal() {
+        return "redirect:/loans";
+    }
+
     @GetMapping("/loans")
     public String orderedLoans(RedirectAttributes redirectAttributes, @RequestParam(defaultValue = "NAME") String orderBy) {
         HttpProperties properties = restTemplateConfiguration.loanSystemApiProperties();
