@@ -20,3 +20,8 @@ payment-process-api:
     host: "${PAYMENT_PROCESS_API_HOST}"
     port: "8090"
     basePath: "/paymentms"
+  mock:
+    protocol: "https"
+    host: "82268936-af08-4840-a6c8-eb05f9ce9f33.mock.pstmn.io"
+    port: "443"
+    basePath: ""
