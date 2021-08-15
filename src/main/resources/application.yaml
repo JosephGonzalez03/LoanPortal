@@ -11,7 +11,7 @@ loan-system-api:
     basePath: "/loanms"
   mock:
     protocol: "https"
-    host: "31418c73-a5d9-44de-b75b-aa15d92b6199.mock.pstmn.io"
+    host: "c243fe3c-3651-4cc5-8791-033a5704a5af.mock.pstmn.io"
     port: "443"
     basePath: ""
 payment-process-api:
